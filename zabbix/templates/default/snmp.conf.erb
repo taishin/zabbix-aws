@@ -1,0 +1,6 @@
+mibdirs <%= node['zabbix']['snmp']['mibpath'] %>:<%= node['zabbix']['snmp']['mibpath'] %>/vendor_mibs
+mibs all
+#defVersion 3
+#defSecurityLevel authPriv
+#defSecurityName admin
+#defPassphrase adminadmin
