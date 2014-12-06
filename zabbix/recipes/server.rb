@@ -24,10 +24,6 @@ when "amazon"
     action :install
   end
 
-#  execute "alternatives-ruby" do
-#    command "/usr/sbin/alternatives --set ruby /usr/bin/ruby1.9"
-#  end
-
   httpd_conf_template = "httpd.conf.azn.erb"
 
 end
@@ -45,7 +41,7 @@ node['zabbix']['server']['gems'].each do |pkg|
   end
 end
 
-execute "create-database-user" do
+execute "create-database-table" do
   exists = <<-EOH
 mysql -u #{node['zabbix']['db']['user']} -p#{node['zabbix']['db']['password']} -h #{node['zabbix']['db']['host']} #{node['zabbix']['db']['name']} -e 'show tables like "maintenances";' | grep -c maintenances
 EOH

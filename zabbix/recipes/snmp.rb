@@ -34,6 +34,7 @@ if node[:platform] == 'amazon' then
     perl-IPC-Cmd
     perl-CPAN-Meta
     perl-Sys-Syslog
+    cpan
   }.each do |pkg|
     package "#{pkg}" do
       action 'install'
