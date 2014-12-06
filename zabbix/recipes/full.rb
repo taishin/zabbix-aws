@@ -105,14 +105,6 @@ template "/etc/monit.d/mail" do
   notifies :restart, "service[monit]"
 end
 
-template "/etc/monit.d/postgres" do
-  source "monit-postgres.erb"
-  mode "00644"
-  owner "root"
-  group "root"
-  notifies :restart, "service[monit]"
-end
-
 template "/etc/monit.d/snmptrapd" do
   source "monit-snmptrapd.erb"
   mode "00644"

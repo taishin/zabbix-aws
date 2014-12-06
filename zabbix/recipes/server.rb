@@ -58,16 +58,6 @@ EOH
 end
 
 
-#script "create_zabbix_table" do
-#  interpreter "bash"
-#  user "root"
-#  code <<-EOH
-#mysql -u zabbix -ppassword -h #{node['zabbix']['db']['host']} zabbix < /usr/share/doc/`rpm -q zabbix-server-mysql | sed -e s/-.\.el.\.x86_64//`/create/schema.sql
-#mysql -u zabbix -ppassword -h #{node['zabbix']['db']['host']} zabbix < /usr/share/doc/`rpm -q zabbix-server-mysql | sed -e s/-.\.el.\.x86_64//`/create/images.sql
-#mysql -u zabbix -ppassword -h #{node['zabbix']['db']['host']} zabbix < /usr/share/doc/`rpm -q zabbix-server-mysql | sed -e s/-.\.el.\.x86_64//`/create/data.sql
-#EOH
-#end
-
 
 template "/etc/zabbix/zabbix_server.conf" do
   source "zabbix_server.conf-#{node['zabbix']['version']['major']}.erb"
@@ -90,12 +80,12 @@ template "/etc/php.ini" do
   mode 0644
 end
 
-template "/etc/httpd/conf/httpd.conf" do
-  source httpd_conf_template
-  owner "root"
-  notifies :restart, "service[httpd]"
-  mode 0644
-end
+#template "/etc/httpd/conf/httpd.conf" do
+#  source httpd_conf_template
+#  owner "root"
+#  notifies :restart, "service[httpd]"
+#  mode 0644
+#end
 
 if node[:platform] == "amazon"
   template "/etc/httpd/conf.d/zabbix.conf" do
@@ -106,6 +96,11 @@ if node[:platform] == "amazon"
   end
 end
 
+template "/var/www/html/index.html" do
+  source "index.html.erb"
+  owner "root"
+  mode 0644
+end
 
 service "zabbix-server" do
   supports :status => true, :restart => true, :reload => true

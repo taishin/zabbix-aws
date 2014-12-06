@@ -36,6 +36,7 @@ default['zabbix']['other']['packages'] = %w{
 	libyaml
 	libxslt-devel
 	libxml2-devel
+	mailx
 }
 
 default['zabbix']['server']['gems'] = %w{

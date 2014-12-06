@@ -13,7 +13,76 @@ node['zabbix']['snmp']['packages'].each do |pkg|
   end
 end
 
-if node[:platform] != 'amazon' then
+if node[:platform] == 'amazon' then
+  user "snmptt" do
+    supports :manage_home => true
+    comment "SNMP Trap Translator"
+    system true
+    shell "/sbin/nologin"
+    home "/var/spool/snmptt"
+  end
+
+  directory "/var/spool/snmptt" do
+    mode '0755'
+  end
+
+  %w{
+    openssl-devel
+    gcc
+    gcc-c++
+    net-snmp
+    perl-IPC-Cmd
+    perl-CPAN-Meta
+    perl-Sys-Syslog
+  }.each do |pkg|
+    package "#{pkg}" do
+      action 'install'
+    end
+  end
+
+  %w{
+    Module::Build::Compat
+    Config::IniFiles
+  }.each do |mod|
+    cpan_client "#{mod}" do
+      action 'install'
+      install_type 'cpan_module'
+      user 'root'
+      group 'root'
+    end
+  end
+
+  remote_file "#{Chef::Config[:file_cache_path]}/snmptt.tgz" do
+    source "http://sourceforge.net/projects/snmptt/files/latest/download?source=files"
+  end
+
+  execute "install_snmptt" do
+    exists = <<-EOH
+which snmptt
+EOH
+    command <<-EOH
+tar xzvf #{Chef::Config[:file_cache_path]}/snmptt.tgz -C #{Chef::Config[:file_cache_path]}
+cp #{Chef::Config[:file_cache_path]}/snmptt_1.4/snmptt /usr/sbin
+cp #{Chef::Config[:file_cache_path]}/snmptt_1.4/snmptthandler /usr/sbin
+cp #{Chef::Config[:file_cache_path]}/snmptt_1.4/snmpttconvert /usr/bin
+cp #{Chef::Config[:file_cache_path]}/snmptt_1.4/snmpttconvertmib /usr/bin
+cp #{Chef::Config[:file_cache_path]}/snmptt_1.4/snmptt-net-snmp-test /usr/bin
+cp #{Chef::Config[:file_cache_path]}/snmptt_1.4/snmptt.logrotate /etc/logrotate.d/snmptt
+cp #{Chef::Config[:file_cache_path]}/snmptt_1.4/snmptt.ini /etc/snmp/
+cp #{Chef::Config[:file_cache_path]}/snmptt_1.4/snmptt-init.d /etc/init.d/snmptt
+/sbin/chkconfig --add snmptt
+EOH
+    not_if exists
+  end
+
+#  directory "/var/spool/snmptt" do
+#    owner 'root'
+#    group 'root'
+#    mode '0744'
+#    action :create
+#  end
+
+else
   package "snmptt" do
     action :install
   end
