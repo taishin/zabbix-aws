@@ -18,13 +18,13 @@ end
 template "/etc/zabbix/zabbix_java_gateway.conf" do
   source "zabbix_java_gateway.conf.erb"
   owner "root"
-  notifies :restart, "service[zabbix-java-gateway]"
+#  notifies :restart, "service[zabbix-java-gateway]"
   mode 0644
 end
 
 service "zabbix-java-gateway" do
   supports :status => true, :restart => true, :reload => true
-  action [ :enable, :start ]
+  action [ :disable, :stop ]
 end
 
 
